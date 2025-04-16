@@ -284,7 +284,15 @@ export function AIChat({ onAIActive, isMuted = true }: AIChatProps) {
     if (isListening) {
       stopSpeechRecognition();
     } else {
-      startSpeechRecognition();
+      // Set the specific message when starting voice recognition
+      setInputValue("you can speak with ai in the future now you chat with ai and it can speak with you");
+      
+      // Use setTimeout to ensure the input value is set before sending the message
+      setTimeout(() => {
+        handleSendMessage();
+        // Start speech recognition after sending the message
+        startSpeechRecognition();
+      }, 100);
     }
   };
 
@@ -615,7 +623,7 @@ export function AIChat({ onAIActive, isMuted = true }: AIChatProps) {
           {isMuted && (
             <div className="bg-gray-800/50 text-white text-sm p-3 rounded-md mb-4">
               <span>
-                Click the green microphone button <span className="inline-block bg-green-500/20 text-green-500 border-green-500 rounded-full p-1"><Mic size={12} /></span> at the bottom of the screen to start voice chat.
+                You can speak with ai in the future now you chat with ai and it can speak with you
               </span>
             </div>
           )}
