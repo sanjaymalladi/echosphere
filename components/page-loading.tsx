@@ -5,7 +5,7 @@ import { Headphones } from "lucide-react"
 
 export function PageLoading() {
   return (
-    <div className="fixed inset-0 bg-[#101820] z-50 flex flex-col items-center justify-center">
+    <div className="fixed inset-0 bg-[#101820] z-50 flex flex-col items-center justify-center" suppressHydrationWarning>
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -29,8 +29,8 @@ export function PageLoading() {
         <h1 className="text-4xl font-bold text-white mb-2">EchoSphere</h1>
         <p className="text-white/80">Where voices meet, and vibes flow.</p>
 
-        <div className="mt-8 flex justify-center">
-          <div className="loading-dots">
+        <div className="mt-8 flex justify-center" suppressHydrationWarning>
+          <div className="loading-dots" suppressHydrationWarning>
             <span></span>
             <span></span>
             <span></span>

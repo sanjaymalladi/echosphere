@@ -168,7 +168,7 @@ export default function RoomPage() {
               <ParticipantsPanel participants={participants} />
             </div>
             <div className="md:col-span-2">
-              <AIChat onAIActive={handleAIActive} />
+              <AIChat onAIActive={handleAIActive} isMuted={currentUser.isMuted} />
             </div>
           </div>
         ) : (

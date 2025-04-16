@@ -129,6 +129,9 @@
   margin-bottom: 8px;
   position: relative;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .message-bubble.user {
@@ -136,6 +139,7 @@
   color: white;
   margin-left: auto;
   border-bottom-right-radius: 4px;
+  justify-content: flex-end;
 }
 
 .message-bubble.ai {
@@ -143,6 +147,25 @@
   color: white;
   margin-right: auto;
   border-bottom-left-radius: 4px;
+  justify-content: space-between;
+}
+
+.message-bubble.error {
+  background-color: rgba(220, 38, 38, 0.3) !important;
+  border: 1px solid rgba(220, 38, 38, 0.5);
+}
+
+.message-bubble button {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.message-bubble:hover button {
+  opacity: 1;
+}
+
+.message-bubble.error button {
+  opacity: 1;
 }
 
 .typing-indicator {
@@ -298,4 +321,14 @@
     transform: scale(1);
     opacity: 1;
   }
+}
+
+.speaker-btn {
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+}
+
+.speaker-btn:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.1);
 }
