@@ -11,7 +11,7 @@ import { PageLoading } from "@/components/page-loading"
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>("All")
   const [isLoading, setIsLoading] = useState(true)
   const [rooms, setRooms] = useState(getAllRooms())
 
@@ -81,7 +81,7 @@ export default function Home() {
               className={`rounded-full ${
                 selectedCategory === category ? "bg-primary" : "bg-transparent border-gray-700"
               }`}
-              onClick={() => setSelectedCategory(category === "All" ? null : category)}
+              onClick={() => setSelectedCategory(category === "All" ? "All" : category)}
             >
               {icon}
               <span className="ml-2">{category}</span>

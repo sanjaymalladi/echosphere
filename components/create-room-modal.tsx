@@ -97,13 +97,45 @@ export function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
             <Label htmlFor="theme">Room Theme</Label>
             <Select value={roomTheme} onValueChange={setRoomTheme}>
               <SelectTrigger id="theme">
-                <SelectValue placeholder="Select a theme" />
+                <SelectValue placeholder="Select a theme">
+                  {roomTheme && (
+                    <div className="flex items-center gap-2">
+                      <div className={`w-4 h-4 rounded-full ${roomTheme}`}></div>
+                      <span>
+                        {roomTheme === "gradient-bg-1" && "Purple Blue"}
+                        {roomTheme === "gradient-bg-2" && "Orange Red"}
+                        {roomTheme === "gradient-bg-3" && "Green Blue"}
+                        {roomTheme === "gradient-bg-4" && "Purple Pink"}
+                      </span>
+                    </div>
+                  )}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="gradient-bg-1">Purple Blue</SelectItem>
-                <SelectItem value="gradient-bg-2">Orange Red</SelectItem>
-                <SelectItem value="gradient-bg-3">Green Blue</SelectItem>
-                <SelectItem value="gradient-bg-4">Purple Pink</SelectItem>
+                <SelectItem value="gradient-bg-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full gradient-bg-1"></div>
+                    <span>Purple Blue</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="gradient-bg-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full gradient-bg-2"></div>
+                    <span>Orange Red</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="gradient-bg-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full gradient-bg-3"></div>
+                    <span>Green Blue</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="gradient-bg-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full gradient-bg-4"></div>
+                    <span>Purple Pink</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
