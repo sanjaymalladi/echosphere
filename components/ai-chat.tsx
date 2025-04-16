@@ -5,9 +5,9 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Send, Smile } from "lucide-react"
-import { getRandomAIResponse } from "@/lib/data"
+import { Send, Smile, Mic, MicOff } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { generateAIResponse } from "@/lib/gemini"
 
 interface Message {
   id: string
@@ -32,9 +32,12 @@ export function AIChat({ onAIActive }: AIChatProps) {
   const [inputValue, setInputValue] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [emoji, setEmoji] = useState<{ id: string; emoji: string; x: number; y: number } | null>(null)
+  const [isRecording, setIsRecording] = useState(false)
+  const [isListening, setIsListening] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
+  const recognitionRef = useRef<SpeechRecognition | null>(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -44,7 +47,60 @@ export function AIChat({ onAIActive }: AIChatProps) {
     scrollToBottom()
   }, [messages, isTyping])
 
-  const handleSendMessage = () => {
+  useEffect(() => {
+    // Initialize speech recognition if browser supports it
+    if (typeof window !== 'undefined' && 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      // @ts-ignore - Typescript doesn't know about webkitSpeechRecognition
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      
+      // Handle recognition results
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0])
+          .map((result: any) => result.transcript)
+          .join('');
+        
+        setInputValue(transcript);
+      };
+      
+      // Handle end of speech recognition
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+    
+    return () => {
+      // Clean up speech recognition
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, []);
+
+  const toggleSpeechRecognition = () => {
+    if (!recognitionRef.current) {
+      alert('Speech recognition is not supported in your browser.');
+      return;
+    }
+    
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      
+      if (inputValue.trim()) {
+        handleSendMessage();
+      }
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+      setInputValue('');
+    }
+  };
+
+  const handleSendMessage = async () => {
     if (!inputValue.trim()) return
 
     // Add user message
@@ -56,29 +112,42 @@ export function AIChat({ onAIActive }: AIChatProps) {
     }
 
     setMessages((prev) => [...prev, userMessage])
+    const userInput = inputValue;
     setInputValue("")
 
     // Simulate AI typing
     setIsTyping(true)
     onAIActive(true)
 
-    // Random delay between 1-3 seconds
-    const typingDelay = Math.floor(Math.random() * 2000) + 1000
-
-    setTimeout(() => {
-      setIsTyping(false)
-      onAIActive(false)
-
+    try {
+      // Get response from Gemini API
+      const aiResponseText = await generateAIResponse(userInput);
+      
       // Add AI response
       const aiResponse: Message = {
         id: `ai-${Date.now()}`,
-        text: getRandomAIResponse(),
+        text: aiResponseText,
         sender: "ai",
         timestamp: new Date(),
       }
 
       setMessages((prev) => [...prev, aiResponse])
-    }, typingDelay)
+    } catch (error) {
+      console.error("Error getting AI response:", error);
+      
+      // Add error message
+      const errorResponse: Message = {
+        id: `ai-error-${Date.now()}`,
+        text: "Sorry, I encountered an error. Please try again later.",
+        sender: "ai",
+        timestamp: new Date(),
+      }
+      
+      setMessages((prev) => [...prev, errorResponse])
+    } finally {
+      setIsTyping(false)
+      onAIActive(false)
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -157,13 +226,24 @@ export function AIChat({ onAIActive }: AIChatProps) {
           <Button variant="outline" size="icon" className="rounded-full" onClick={showRandomEmoji}>
             <Smile size={20} />
           </Button>
+          
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className={`rounded-full ${isListening ? 'bg-red-500 text-white hover:bg-red-600' : ''}`} 
+            onClick={toggleSpeechRecognition}
+          >
+            {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+          </Button>
+          
           <Input
-            placeholder="Type a message..."
+            placeholder={isListening ? "Listening..." : "Type a message..."}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             className="bg-gray-800 border-gray-700"
           />
+          
           <Button
             className="rounded-full bg-primary hover:bg-primary/90"
             size="icon"
